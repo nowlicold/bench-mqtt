@@ -1,5 +1,10 @@
 package com.bench.mqtt.callback;
 
+import com.bench.mqtt.client.MQTTClient;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
 /**
  * <p>
  * 同步 MQTT 客户端回调接口聚合
@@ -8,6 +13,12 @@ package com.bench.mqtt.callback;
  * @author Karl
  * @date 2022/7/1 17:36
  */
-public interface MQTTCallback extends ConnectCompleteCallback, ConnectLostCallback, MessageArrivedCallback, DeliveryCompleteCallback {
+public interface MQTTCallback {
+    void connectComplete(boolean reconnect, String serverURI);
 
+    void connectionLost(MQTTClient mqttClient, Throwable throwable) throws MqttException;
+
+    void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken);
+
+    void messageArrived(String topic, MqttMessage mqttMessage);
 }

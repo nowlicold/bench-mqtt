@@ -35,6 +35,10 @@
             <groupId>com.bench.common</groupId>
             <artifactId>common-model</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.bench.httpclient</groupId>
+            <artifactId>bench-httpclient-provider</artifactId>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>

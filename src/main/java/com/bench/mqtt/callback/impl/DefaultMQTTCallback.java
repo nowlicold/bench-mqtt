@@ -1,10 +1,13 @@
 package com.bench.mqtt.callback.impl;
 
+import com.bench.lang.base.string.utils.StringUtils;
 import com.bench.mqtt.callback.*;
 import com.bench.mqtt.client.MQTTClient;
+import com.bench.mqtt.reconnect.Reconnector;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,17 +21,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class DefaultMQTTCallback implements MQTTCallback {
-    private final ConnectCompleteCallback connectCompleteCallback;
-    private final ConnectLostCallback connectLostCallback;
-    private final DeliveryCompleteCallback deliveryCompleteCallback;
-    private final MessageArrivedCallback messageArrivedCallback;
+    private final Reconnector reconnector;
 
     @Autowired
-    public DefaultMQTTCallback(ConnectCompleteCallback connectCompleteCallback, ConnectLostCallback connectLostCallback, DeliveryCompleteCallback deliveryCompleteCallback, MessageArrivedCallback messageArrivedCallback) {
-        this.connectCompleteCallback = connectCompleteCallback;
-        this.connectLostCallback = connectLostCallback;
-        this.deliveryCompleteCallback = deliveryCompleteCallback;
-        this.messageArrivedCallback = messageArrivedCallback;
+    public DefaultMQTTCallback(Reconnector reconnector) {
+        this.reconnector = reconnector;
     }
 
     /**
@@ -38,10 +35,13 @@ public class DefaultMQTTCallback implements MQTTCallback {
      *
      * @param throwable throwable
      */
-    @SneakyThrows
     @Override
-    public void connectionLost(MQTTClient mqttClient, Throwable throwable) {
-        this.connectLostCallback.connectionLost(mqttClient, throwable);
+    public void connectionLost(MQTTClient mqttClient, Throwable throwable) throws MqttException {
+        log.error("MQTT disconnected: {}", throwable.getMessage());
+        throwable.printStackTrace();
+        log.info("MQTT reconnecting...");
+        //重新连接
+        reconnector.reconnect(mqttClient);
     }
 
     /**
@@ -54,7 +54,7 @@ public class DefaultMQTTCallback implements MQTTCallback {
      */
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
-        this.connectCompleteCallback.connectComplete(reconnect, serverURI);
+        log.info("MQTT connected");
     }
 
     /**
@@ -66,7 +66,7 @@ public class DefaultMQTTCallback implements MQTTCallback {
      */
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) {
-        this.messageArrivedCallback.messageArrived(topic, mqttMessage);
+        log.info("MQTT message arrived. {}: {}", topic, new String(mqttMessage.getPayload()));
     }
 
     /**
@@ -74,8 +74,11 @@ public class DefaultMQTTCallback implements MQTTCallback {
      *
      * @param iMqttDeliveryToken iMqttDeliveryToken
      */
+    @SneakyThrows
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-        this.deliveryCompleteCallback.deliveryComplete(iMqttDeliveryToken);
+        String[] topics = iMqttDeliveryToken.getTopics();
+        String payload = new String(iMqttDeliveryToken.getMessage().getPayload());
+        log.info("MQTT message delivered. {} -> {}", payload, StringUtils.join(topics, StringUtils.COMMA_SIGN));
     }
 }

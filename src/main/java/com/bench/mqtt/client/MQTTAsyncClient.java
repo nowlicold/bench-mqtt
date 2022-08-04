@@ -3,6 +3,7 @@ package com.bench.mqtt.client;
 import com.bench.mqtt.callback.MQTTAsyncCallback;
 import com.bench.mqtt.config.MQTTConfig;
 import com.bench.mqtt.config.generator.MQTTConfigGenerator;
+import com.bench.mqtt.exception.BadUsernamePasswordException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
@@ -73,7 +74,6 @@ public class MQTTAsyncClient implements IMqttAsyncClient {
         }
     }
 
-
     @Override
     public IMqttToken connect() throws MqttException {
         if (!Objects.isNull(mqttClient) && mqttClient.isConnected()) {
@@ -95,7 +95,9 @@ public class MQTTAsyncClient implements IMqttAsyncClient {
         options.setAutomaticReconnect(true);
 
         log.info("connecting to MQTT Server. clientId: {}", mqttConfig.getClientId());
-        return this.mqttClient.connect(options);
+        IMqttToken token = this.mqttClient.connect(options);
+        token.waitForCompletion();
+        return token;
     }
 
     @Override
@@ -269,7 +271,15 @@ public class MQTTAsyncClient implements IMqttAsyncClient {
 
     @Override
     public void reconnect() throws MqttException {
-        mqttClient.reconnect();
+        try {
+            mqttClient.reconnect();
+        } catch (MqttException e) {
+            if (e.getReasonCode() == MqttException.REASON_CODE_FAILED_AUTHENTICATION) {
+                // 用户名或密码错误
+                throw new BadUsernamePasswordException(e.getReasonCode());
+            }
+            throw e;
+        }
     }
 
     @Override

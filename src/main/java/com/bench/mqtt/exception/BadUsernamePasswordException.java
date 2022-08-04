@@ -1,7 +1,9 @@
 package com.bench.mqtt.exception;
 
-public class BadUsernamePasswordException extends ConnectionException{
-    public BadUsernamePasswordException(String reason) {
-        super(reason);
+import org.eclipse.paho.client.mqttv3.MqttException;
+
+public class BadUsernamePasswordException extends MqttException {
+    public BadUsernamePasswordException(int reasonCode) {
+        super(reasonCode);
     }
 }
