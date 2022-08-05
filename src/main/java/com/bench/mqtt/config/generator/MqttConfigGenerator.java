@@ -1,6 +1,6 @@
 package com.bench.mqtt.config.generator;
 
-import com.bench.mqtt.config.MQTTConfig;
+import com.bench.mqtt.config.MqttConfig;
 
 /**
  * <p>
@@ -10,6 +10,6 @@ import com.bench.mqtt.config.MQTTConfig;
  * @author Karl
  * @date 2022/7/1 14:40
  */
-public interface MQTTConfigGenerator {
-    MQTTConfig generator();
+public interface MqttConfigGenerator {
+    MqttConfig generator();
 }

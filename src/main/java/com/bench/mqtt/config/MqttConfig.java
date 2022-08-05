@@ -12,7 +12,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
  * @date 2022/7/1 12:04
  */
 @Data
-public class MQTTConfig {
+public class MqttConfig {
 
     private String url = "ssl://mqtt.felo.me:8883";
     private String clientId;

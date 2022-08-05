@@ -66,7 +66,7 @@ public class MyMqttCallback implements MqttCallback {
 }
 ```
 ### 2.6 自定义重试（可选）
-bench-mqtt 中实现了默认的重试机制。如果需要自定义重试实现机制，需要实现对应的接口。`AsyncReconnector` 或者 `Reconnector`
+bench-mqtt 中实现了默认的重试机制。如果需要自定义重试实现机制，需要实现对应的接口`Reconnector`
  ```java
 @Component
 @Primary

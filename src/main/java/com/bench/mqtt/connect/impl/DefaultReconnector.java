@@ -1,8 +1,9 @@
-package com.bench.mqtt.reconnect.impl;
+package com.bench.mqtt.connect.impl;
 
-import com.bench.mqtt.client.MQTTAsyncClient;
-import com.bench.mqtt.client.MQTTClient;
-import com.bench.mqtt.reconnect.AsyncReconnector;
+import com.bench.mqtt.client.MqttClient;
+import com.bench.mqtt.connect.ConnectClient;
+import com.bench.mqtt.connect.Reconnector;
+import com.bench.mqtt.connect.adapter.ConnectClientAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,11 @@ import java.util.TimerTask;
  */
 @Component
 @Slf4j
-public class AsyncDefaultReconnector implements AsyncReconnector {
-
+public class DefaultReconnector implements Reconnector {
     @Override
-    public void reconnect(MQTTAsyncClient mqttClient) throws MqttException {
-        new ReconnectTimer().start(mqttClient);
+    public void reconnect(ConnectClient connectClient) throws MqttException {
+        ReconnectTimer reconnectTimer = new ReconnectTimer();
+        reconnectTimer.start(connectClient);
     }
 
     static class ReconnectTimer {
@@ -43,18 +44,18 @@ public class AsyncDefaultReconnector implements AsyncReconnector {
             //this.count = 0;
         }
 
-        public void start(MQTTAsyncClient mqttClient) {
+        public void start(ConnectClient connectClient) {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     try {
-                        mqttClient.reconnect();
+                        connectClient.reconnect();
                         // 重试成功
                         log.info("reconnected");
                     } catch (Exception e) {
                         log.error("failed to reconnect. try to connect again.", e);
                         try {
-                            mqttClient.connect();
+                            connectClient.connect();
                         } catch (MqttException ex) {
                             ex.printStackTrace();
                         }

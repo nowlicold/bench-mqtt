@@ -9,7 +9,7 @@ import com.bench.httpclient.base.response.HttpResponse;
 import com.bench.lang.base.json.jackson.JacksonUtils;
 import com.bench.lang.base.string.utils.StringUtils;
 import com.bench.mqtt.config.FeloAppConfig;
-import com.bench.mqtt.config.MQTTConfig;
+import com.bench.mqtt.config.MqttConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
@@ -34,16 +34,16 @@ import java.util.Objects;
 @Component
 @Lazy
 @Slf4j
-public class FeloMQTTConfigGenerator implements MQTTConfigGenerator {
+public class FeloMqttConfigGenerator implements MqttConfigGenerator {
     private final FeloAppConfig feloAppConfig;
 
     @Autowired
-    public FeloMQTTConfigGenerator(FeloAppConfig feloAppConfig) {
+    public FeloMqttConfigGenerator(FeloAppConfig feloAppConfig) {
         this.feloAppConfig = feloAppConfig;
     }
 
     @Override
-    public MQTTConfig generator() {
+    public MqttConfig generator() {
         JsonNode jsonNode = getMqttInfo();
         if (Objects.isNull(jsonNode)){
             throw new RuntimeException("failed to generate mqtt info");
@@ -54,7 +54,7 @@ public class FeloMQTTConfigGenerator implements MQTTConfigGenerator {
         String username = JacksonUtils.getStringValue(jsonNode, "username");
         String password = JacksonUtils.getStringValue(jsonNode, "token");
 
-        MQTTConfig mqttConfig = new MQTTConfig();
+        MqttConfig mqttConfig = new MqttConfig();
         mqttConfig.setUrl(url);
         mqttConfig.setClientId(clientId);
         mqttConfig.setUsername(username);

@@ -1,9 +1,8 @@
 package com.bench.mqtt.client;
 
-import com.bench.mqtt.callback.MQTTCallback;
-import com.bench.mqtt.client.adapter.ClientTypeEnum;
-import com.bench.mqtt.config.MQTTConfig;
-import com.bench.mqtt.config.generator.MQTTConfigGenerator;
+import com.bench.mqtt.callback.MqttCallback;
+import com.bench.mqtt.config.MqttConfig;
+import com.bench.mqtt.config.generator.MqttConfigGenerator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
@@ -24,14 +23,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "mqtt.client", matchIfMissing = true, havingValue = ClientTypeEnum.DEFAULT_NAME)
-public class MQTTClient implements IMqttClient {
-    private final MQTTCallback mqttCallback;
-    private final MQTTConfigGenerator mqttConfigGenerator;
+@ConditionalOnProperty(name = "mqtt.client", matchIfMissing = true, havingValue = MqttClientType.DEFAULT)
+public class MqttClient implements IMqttClient {
+    private final MqttCallback mqttCallback;
+    private final MqttConfigGenerator mqttConfigGenerator;
     private IMqttClient mqttClient;
 
     @Autowired
-    public MQTTClient(MQTTCallback mqttCallback, MQTTConfigGenerator mqttConfigGenerator) {
+    public MqttClient(MqttCallback mqttCallback, MqttConfigGenerator mqttConfigGenerator) {
         this.mqttCallback = mqttCallback;
         this.mqttConfigGenerator = mqttConfigGenerator;
     }
@@ -47,16 +46,16 @@ public class MQTTClient implements IMqttClient {
      * @date 2022/7/1 17:39
      */
     class InternalCallback implements MqttCallbackExtended {
-        private final MQTTCallback mqttCallback;
+        private final MqttCallback mqttCallback;
 
-        public InternalCallback(MQTTCallback mqttCallback) {
+        public InternalCallback(MqttCallback mqttCallback) {
             this.mqttCallback = mqttCallback;
         }
 
         @Override
         @SneakyThrows
         public void connectionLost(Throwable throwable) {
-            mqttCallback.connectionLost(MQTTClient.this, throwable);
+            mqttCallback.connectionLost(MqttClient.this, throwable);
         }
 
         @Override
@@ -82,9 +81,9 @@ public class MQTTClient implements IMqttClient {
             close();
         }
 
-        MQTTConfig mqttConfig = mqttConfigGenerator.generator();
+        MqttConfig mqttConfig = mqttConfigGenerator.generator();
 
-        mqttClient = new MqttClient(mqttConfig.getUrl(), mqttConfig.getClientId());
+        mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConfig.getUrl(), mqttConfig.getClientId());
         mqttClient.setCallback(new InternalCallback(mqttCallback)); // 设置默认回调
 
         MqttConnectOptions options = new MqttConnectOptions();
@@ -235,7 +234,7 @@ public class MQTTClient implements IMqttClient {
     }
 
     @Override
-    public void setCallback(MqttCallback mqttCallback) {
+    public void setCallback(org.eclipse.paho.client.mqttv3.MqttCallback mqttCallback) {
         mqttClient.setCallback(mqttCallback);
     }
 

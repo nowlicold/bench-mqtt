@@ -2,9 +2,10 @@ package com.bench.mqtt.callback.impl;
 
 import com.bench.lang.base.string.utils.StringUtils;
 import com.bench.mqtt.callback.*;
-import com.bench.mqtt.client.MQTTAsyncClient;
-import com.bench.mqtt.client.MQTTClient;
-import com.bench.mqtt.reconnect.AsyncReconnector;
+import com.bench.mqtt.client.AsyncMqttClient;
+import com.bench.mqtt.connect.ConnectClient;
+import com.bench.mqtt.connect.Reconnector;
+import com.bench.mqtt.connect.adapter.AsyncConnectClientAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -21,11 +22,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class DefaultMQTTAsyncCallback implements MQTTAsyncCallback {
-    private final AsyncReconnector reconnector;
+public class DefaultAsyncMqttCallback implements AsyncMqttCallback {
+    private final Reconnector reconnector;
 
     @Autowired
-    public DefaultMQTTAsyncCallback(AsyncReconnector reconnector) {
+    public DefaultAsyncMqttCallback(Reconnector reconnector) {
         this.reconnector = reconnector;
     }
 
@@ -37,12 +38,12 @@ public class DefaultMQTTAsyncCallback implements MQTTAsyncCallback {
      * @param throwable throwable
      */
     @Override
-    public void connectionLost(MQTTAsyncClient mqttClient, Throwable throwable) throws MqttException {
+    public void connectionLost(AsyncMqttClient mqttClient, Throwable throwable) throws MqttException {
         log.error("MQTT disconnected: {}", throwable.getMessage());
         throwable.printStackTrace();
         log.info("MQTT reconnecting...");
         //重新连接
-        reconnector.reconnect(mqttClient);
+        reconnector.reconnect(new AsyncConnectClientAdapter(mqttClient).getAdapter());
     }
     /**
      * 连接/重连成功后调用

@@ -1,9 +1,8 @@
 package com.bench.mqtt.client;
 
-import com.bench.mqtt.callback.MQTTAsyncCallback;
-import com.bench.mqtt.client.adapter.ClientTypeEnum;
-import com.bench.mqtt.config.MQTTConfig;
-import com.bench.mqtt.config.generator.MQTTConfigGenerator;
+import com.bench.mqtt.callback.AsyncMqttCallback;
+import com.bench.mqtt.config.MqttConfig;
+import com.bench.mqtt.config.generator.MqttConfigGenerator;
 import com.bench.mqtt.exception.BadUsernamePasswordException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +25,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "mqtt.client", havingValue = ClientTypeEnum.ASYNC_NAME)
-public class MQTTAsyncClient implements IMqttAsyncClient {
-    private final MQTTAsyncCallback mqttCallback;
-    private final MQTTConfigGenerator mqttConfigGenerator;
+@ConditionalOnProperty(name = "mqtt.client", havingValue = MqttClientType.ASYNC)
+public class AsyncMqttClient implements IMqttAsyncClient {
+    private final AsyncMqttCallback mqttCallback;
+    private final MqttConfigGenerator mqttConfigGenerator;
     private IMqttAsyncClient mqttClient;
 
     @Autowired
-    public MQTTAsyncClient(MQTTAsyncCallback mqttCallback, MQTTConfigGenerator mqttConfigGenerator) {
+    public AsyncMqttClient(AsyncMqttCallback mqttCallback, MqttConfigGenerator mqttConfigGenerator) {
         this.mqttCallback = mqttCallback;
         this.mqttConfigGenerator = mqttConfigGenerator;
     }
@@ -49,16 +48,16 @@ public class MQTTAsyncClient implements IMqttAsyncClient {
      * @date 2022/7/1 17:39
      */
     class InternalCallback implements MqttCallbackExtended {
-        private final MQTTAsyncCallback mqttCallback;
+        private final AsyncMqttCallback mqttCallback;
 
-        public InternalCallback(MQTTAsyncCallback mqttCallback) {
+        public InternalCallback(AsyncMqttCallback mqttCallback) {
             this.mqttCallback = mqttCallback;
         }
 
         @Override
         @SneakyThrows
         public void connectionLost(Throwable throwable) {
-            mqttCallback.connectionLost(MQTTAsyncClient.this, throwable);
+            mqttCallback.connectionLost(AsyncMqttClient.this, throwable);
         }
 
         @Override
@@ -84,7 +83,7 @@ public class MQTTAsyncClient implements IMqttAsyncClient {
             close();
         }
 
-        MQTTConfig mqttConfig = mqttConfigGenerator.generator();
+        MqttConfig mqttConfig = mqttConfigGenerator.generator();
 
         mqttClient = createMqttClient(mqttConfig.getUrl(), mqttConfig.getClientId());
         mqttClient.setCallback(new InternalCallback(mqttCallback)); // 设置默认回调
@@ -119,7 +118,7 @@ public class MQTTAsyncClient implements IMqttAsyncClient {
     }
 
     private IMqttAsyncClient createMqttClient(String url, String clientId) throws MqttException {
-        return new MqttAsyncClient(url, clientId, new MemoryPersistence());
+        return new org.eclipse.paho.client.mqttv3.MqttAsyncClient(url, clientId, new MemoryPersistence());
     }
 
     @Override

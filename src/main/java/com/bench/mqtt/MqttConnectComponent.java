@@ -1,17 +1,12 @@
 package com.bench.mqtt;
 
-import com.bench.mqtt.client.adapter.ClientTypeEnum;
-import com.bench.mqtt.client.ConnectClient;
-import com.bench.mqtt.client.adapter.ConnectClientAdapter;
+import com.bench.mqtt.connect.ConnectClient;
+import com.bench.mqtt.connect.adapter.ConnectClientAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * <p>
@@ -23,11 +18,11 @@ import java.util.Optional;
  */
 @Component
 @Slf4j
-public class MQTTConnectComponent implements ApplicationRunner {
+public class MqttConnectComponent implements ApplicationRunner {
     private final ConnectClientAdapter connectClientAdapter;
 
     @Autowired
-    public MQTTConnectComponent(ConnectClientAdapter connectClientAdapter) {
+    public MqttConnectComponent(ConnectClientAdapter connectClientAdapter) {
         this.connectClientAdapter = connectClientAdapter;
     }
 
@@ -36,7 +31,7 @@ public class MQTTConnectComponent implements ApplicationRunner {
         log.info("Connecting to MQTT");
         new Thread(() -> {
             try {
-                ConnectClient connectClient = connectClientAdapter.get();
+                ConnectClient connectClient = connectClientAdapter.getAdapter();
                 connectClient.connect();
             } catch (Exception e) {
                 log.warn("Failed to connect MQTT", e);
