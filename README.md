@@ -1,13 +1,12 @@
 # bench-mqtt
 
 ## 1. bench-mqtt 结构
-![结构图](doc/image/structure.png)
-
+![img.png](doc/image/img.png)
 - Runner: 负责与 Spring 集成，基于 ApplicationRunner
 - Client: 负责实现 Mqtt 客户端，提供可用的 Mqtt 客户端
 - Callback: 负责 Mqtt 一系列回调的实现
 - Config: 负责管理 Mqtt 连接必要的配置信息 
-- Reconnect: 负责 Mqtt 客户端断线后的重连
+- Connect: 负责 Mqtt 客户端的连接和断线后的重连
 
 ## 2. 快速使用
 ### 2.1 引入依赖
