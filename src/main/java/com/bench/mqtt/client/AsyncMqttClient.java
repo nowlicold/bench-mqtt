@@ -62,7 +62,7 @@ public class AsyncMqttClient implements IMqttAsyncClient {
 
         @Override
         public void connectComplete(boolean reconnect, String serverURI) {
-            mqttCallback.connectComplete(reconnect, serverURI);
+            mqttCallback.connectComplete(AsyncMqttClient.this, reconnect, serverURI);
         }
 
         @Override

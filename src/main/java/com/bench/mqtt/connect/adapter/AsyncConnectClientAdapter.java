@@ -2,6 +2,7 @@ package com.bench.mqtt.connect.adapter;
 
 import com.bench.mqtt.client.*;
 import com.bench.mqtt.connect.ConnectClient;
+import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,10 +19,10 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(name = "mqtt.client", havingValue = MqttClientType.ASYNC)
 public class AsyncConnectClientAdapter implements ConnectClientAdapter {
-    private final AsyncMqttClient mqttClient;
+    private final IMqttAsyncClient mqttClient;
 
     @Autowired
-    public AsyncConnectClientAdapter(AsyncMqttClient mqttClient) {
+    public AsyncConnectClientAdapter(IMqttAsyncClient mqttClient) {
         this.mqttClient = mqttClient;
     }
 

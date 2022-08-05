@@ -8,6 +8,7 @@ import com.bench.mqtt.connect.Reconnector;
 import com.bench.mqtt.connect.adapter.DefaultConnectClientAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -38,7 +39,7 @@ public class DefaultMqttCallback implements MqttCallback {
      * @param throwable throwable
      */
     @Override
-    public void connectionLost(MqttClient mqttClient, Throwable throwable) throws MqttException {
+    public void connectionLost(IMqttClient mqttClient, Throwable throwable) throws MqttException {
         log.error("MQTT disconnected: {}", throwable.getMessage());
         throwable.printStackTrace();
         log.info("MQTT reconnecting...");
@@ -55,7 +56,7 @@ public class DefaultMqttCallback implements MqttCallback {
      * @param serverURI serverURI
      */
     @Override
-    public void connectComplete(boolean reconnect, String serverURI) {
+    public void connectComplete(IMqttClient mqttClient, boolean reconnect, String serverURI) {
         log.info("MQTT connected");
     }
 

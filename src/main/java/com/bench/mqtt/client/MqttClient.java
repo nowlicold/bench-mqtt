@@ -60,7 +60,7 @@ public class MqttClient implements IMqttClient {
 
         @Override
         public void connectComplete(boolean reconnect, String serverURI) {
-            mqttCallback.connectComplete(reconnect, serverURI);
+            mqttCallback.connectComplete(MqttClient.this, reconnect, serverURI);
         }
 
         @Override
