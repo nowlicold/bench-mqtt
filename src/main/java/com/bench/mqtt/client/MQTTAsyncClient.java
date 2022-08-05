@@ -1,6 +1,7 @@
 package com.bench.mqtt.client;
 
 import com.bench.mqtt.callback.MQTTAsyncCallback;
+import com.bench.mqtt.client.adapter.ClientTypeEnum;
 import com.bench.mqtt.config.MQTTConfig;
 import com.bench.mqtt.config.generator.MQTTConfigGenerator;
 import com.bench.mqtt.exception.BadUsernamePasswordException;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -24,6 +26,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "mqtt.client", havingValue = ClientTypeEnum.ASYNC_NAME)
 public class MQTTAsyncClient implements IMqttAsyncClient {
     private final MQTTAsyncCallback mqttCallback;
     private final MQTTConfigGenerator mqttConfigGenerator;

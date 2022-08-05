@@ -24,13 +24,11 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class MQTTConnectComponent implements ApplicationRunner {
-    private final String clientType;
-    private final List<ConnectClientAdapter> connectClientAdapters;
+    private final ConnectClientAdapter connectClientAdapter;
 
     @Autowired
-    public MQTTConnectComponent(List<ConnectClientAdapter> connectClientAdapters, @Value("${mqtt.client:DEFAULT}") String clientType) {
-        this.connectClientAdapters = connectClientAdapters;
-        this.clientType = clientType;
+    public MQTTConnectComponent(ConnectClientAdapter connectClientAdapter) {
+        this.connectClientAdapter = connectClientAdapter;
     }
 
     @Override
@@ -38,14 +36,7 @@ public class MQTTConnectComponent implements ApplicationRunner {
         log.info("Connecting to MQTT");
         new Thread(() -> {
             try {
-                Optional<ConnectClientAdapter> first = connectClientAdapters.stream()
-                        .filter(connectClientAdapter -> connectClientAdapter.support(ClientTypeEnum.valueOf(clientType)))
-                        .findFirst();
-                if (!first.isPresent()) {
-                    log.error("Not found a valid MQTT client type, clientType={}", this.clientType);
-                    return;
-                }
-                ConnectClient connectClient = first.get().get();
+                ConnectClient connectClient = connectClientAdapter.get();
                 connectClient.connect();
             } catch (Exception e) {
                 log.warn("Failed to connect MQTT", e);

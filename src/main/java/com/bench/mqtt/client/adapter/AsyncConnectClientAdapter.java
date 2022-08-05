@@ -4,6 +4,7 @@ import com.bench.mqtt.client.*;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
  * @date 2022/8/3 11:38
  */
 @Component
+@ConditionalOnProperty(name = "mqtt.client", havingValue = ClientTypeEnum.ASYNC_NAME)
 public class AsyncConnectClientAdapter implements ConnectClientAdapter {
     private final MQTTAsyncClient mqttClient;
 
