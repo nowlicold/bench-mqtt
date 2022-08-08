@@ -2,18 +2,19 @@ package com.bench.mqtt.callback.impl;
 
 import com.bench.lang.base.string.utils.StringUtils;
 import com.bench.mqtt.callback.*;
+import com.bench.mqtt.callback.MqttCallback;
 import com.bench.mqtt.client.MqttClient;
 import com.bench.mqtt.connect.ConnectClient;
 import com.bench.mqtt.connect.Reconnector;
 import com.bench.mqtt.connect.adapter.DefaultConnectClientAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * 同步 MQTT 客户端，全局回调器
@@ -58,6 +59,13 @@ public class DefaultMqttCallback implements MqttCallback {
     @Override
     public void connectComplete(IMqttClient mqttClient, boolean reconnect, String serverURI) {
         log.info("MQTT connected");
+
+        try {
+            mqttClient.publish("/felo/app/yd996720A2600649649D836C46E41FBB0A/9a7ab66b87c470a57d2ffa7047494f9e", "test".getBytes(StandardCharsets.UTF_8), 1, false);
+        } catch (MqttException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
@@ -81,7 +89,10 @@ public class DefaultMqttCallback implements MqttCallback {
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
         String[] topics = iMqttDeliveryToken.getTopics();
-        String payload = new String(iMqttDeliveryToken.getMessage().getPayload());
-        log.info("MQTT message delivered. {} -> {}", payload, StringUtils.join(topics, StringUtils.COMMA_SIGN));
+        MqttMessage message = iMqttDeliveryToken.getMessage();
+        if (Objects.nonNull(message)) {
+            String payload = new String(message.getPayload());
+            log.info("MQTT message delivered. {} -> {}", payload, StringUtils.join(topics, StringUtils.COMMA_SIGN));
+        }
     }
 }

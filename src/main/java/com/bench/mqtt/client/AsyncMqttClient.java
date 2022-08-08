@@ -94,7 +94,6 @@ public class AsyncMqttClient implements IMqttAsyncClient {
         options.setKeepAliveInterval(mqttConfig.getKeepAliveInterval());
         options.setConnectionTimeout(mqttConfig.getConnectionTimeout());
         options.setCleanSession(mqttConfig.isCleanSession());
-        options.setAutomaticReconnect(true);
 
         log.info("connecting to MQTT Server. clientId: {}", mqttConfig.getClientId());
         IMqttToken token = this.mqttClient.connect(options);

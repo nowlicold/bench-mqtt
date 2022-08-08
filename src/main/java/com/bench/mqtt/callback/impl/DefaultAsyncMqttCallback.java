@@ -15,6 +15,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * 异步 MQTT 客户端，全局回调器
  *
@@ -80,7 +82,10 @@ public class DefaultAsyncMqttCallback implements AsyncMqttCallback {
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
         String[] topics = iMqttDeliveryToken.getTopics();
-        String payload = new String(iMqttDeliveryToken.getMessage().getPayload());
-        log.info("MQTT message delivered. {} -> {}", payload, StringUtils.join(topics, StringUtils.COMMA_SIGN));
+        MqttMessage message = iMqttDeliveryToken.getMessage();
+        if(Objects.nonNull(message)){
+            String payload = new String(message.getPayload());
+            log.info("MQTT message delivered. {} -> {}", payload, StringUtils.join(topics, StringUtils.COMMA_SIGN));
+        }
     }
 }

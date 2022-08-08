@@ -6,6 +6,7 @@ import com.bench.mqtt.config.generator.MqttConfigGenerator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -83,7 +84,7 @@ public class MqttClient implements IMqttClient {
 
         MqttConfig mqttConfig = mqttConfigGenerator.generator();
 
-        mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConfig.getUrl(), mqttConfig.getClientId());
+        mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConfig.getUrl(), mqttConfig.getClientId(), new MemoryPersistence());
         mqttClient.setCallback(new InternalCallback(mqttCallback)); // 设置默认回调
 
         MqttConnectOptions options = new MqttConnectOptions();
@@ -92,7 +93,6 @@ public class MqttClient implements IMqttClient {
         options.setKeepAliveInterval(mqttConfig.getKeepAliveInterval());
         options.setConnectionTimeout(mqttConfig.getConnectionTimeout());
         options.setCleanSession(mqttConfig.isCleanSession());
-        options.setAutomaticReconnect(true);
 
         log.info("connecting to MQTT Server. clientId: {}", mqttConfig.getClientId());
         this.mqttClient.connect(options);
