@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>
@@ -24,6 +26,7 @@ import java.util.TimerTask;
 @Component
 @Slf4j
 public class DefaultReconnector implements Reconnector {
+
     @Override
     public void reconnect(ConnectClient connectClient) throws MqttException {
         ReconnectTimer reconnectTimer = new ReconnectTimer();
@@ -48,21 +51,36 @@ public class DefaultReconnector implements Reconnector {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    if (connectClient.isConnected()) {
+                        timer.cancel();
+                        return;
+                    }
+
                     try {
-                        connectClient.reconnect();
-                        // 重试成功
-                        log.info("reconnected");
-                    } catch (Exception e) {
+                        if (!connectClient.isConnected()){
+                            connectClient.reconnect();
+                        }
+                    } catch (MqttException e){
+                        // 已经连接上了，忽略
+                        if (e.getReasonCode() == MqttException.REASON_CODE_CONNECT_IN_PROGRESS) {
+                            timer.cancel();
+                            return;
+                        }
+
                         log.error("failed to reconnect. try to connect again.", e);
                         try {
                             connectClient.connect();
                         } catch (MqttException ex) {
-                            ex.printStackTrace();
+                            log.error("failed to connect mqtt. ", ex);
                         }
                     }
-                    timer.cancel();
                 }
-            }, retryInterval);
+            }, 0, retryInterval);
         }
     }
+
+   /* public static void main(String[] args) {
+        ReconnectTimer reconnectTimer = new ReconnectTimer();
+        reconnectTimer.start(null);
+    }*/
 }

@@ -25,9 +25,9 @@ public class AsyncMqttClientTest {
             DefaultAsyncMqttCallback defaultAsyncMqttCallback = new DefaultAsyncMqttCallback(new DefaultReconnector());
 
             FeloAppConfig feloAppConfig = new FeloAppConfig();
-            feloAppConfig.setAppId("yd996720A2600649649D836C46E41FBB0A");
-            feloAppConfig.setAppSecret("X9IVnzPwvGNd8Jz7UamT7BpvqVOckz2jfiEx3y2vnd4=");
-            feloAppConfig.setFeloSvrUrl("https://open.felo.me");
+            feloAppConfig.setAppId("yd9DDF0880AB034146AB3C73A10F6ED62A");
+            feloAppConfig.setAppSecret("H2H7oJEJOJEjWAV06ETVvf1bNrA+ipkX6vQc+ijbRYY=");
+            feloAppConfig.setFeloSvrUrl("https://api.sandbox.felo.me");
 
             MqttConfigGenerator mqttConfigGenerator = new FeloMqttConfigGenerator(feloAppConfig);
             AsyncMqttClient asyncMqttClient = new AsyncMqttClient(defaultAsyncMqttCallback, mqttConfigGenerator);

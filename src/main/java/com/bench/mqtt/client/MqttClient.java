@@ -270,7 +270,7 @@ public class MqttClient implements IMqttClient {
 
     @Override
     public void reconnect() throws MqttException {
-        mqttClient.reconnect();
+        if (!mqttClient.isConnected()) mqttClient.reconnect();
     }
 
     @Override

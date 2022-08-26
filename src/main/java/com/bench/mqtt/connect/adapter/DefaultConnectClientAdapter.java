@@ -37,7 +37,15 @@ public class DefaultConnectClientAdapter implements ConnectClientAdapter {
 
             @Override
             public void reconnect() throws MqttException {
-                mqttClient.reconnect();
+                if (!mqttClient.isConnected()){
+                    mqttClient.reconnect();
+                }
+
+            }
+
+            @Override
+            public boolean isConnected() {
+                return mqttClient.isConnected();
             }
         };
     }

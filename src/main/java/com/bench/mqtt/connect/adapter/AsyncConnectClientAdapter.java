@@ -38,6 +38,11 @@ public class AsyncConnectClientAdapter implements ConnectClientAdapter {
             public void reconnect() throws MqttException {
                 mqttClient.reconnect();
             }
+
+            @Override
+            public boolean isConnected() {
+                return mqttClient.isConnected();
+            }
         };
     }
 }

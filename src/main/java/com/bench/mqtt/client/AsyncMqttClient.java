@@ -272,8 +272,9 @@ public class AsyncMqttClient implements IMqttAsyncClient {
 
     @Override
     public void reconnect() throws MqttException {
+
         try {
-            mqttClient.reconnect();
+            if (!mqttClient.isConnected()) mqttClient.reconnect();
         } catch (MqttException e) {
             if (e.getReasonCode() == MqttException.REASON_CODE_FAILED_AUTHENTICATION) {
                 // 用户名或密码错误
