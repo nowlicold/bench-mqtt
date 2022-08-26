@@ -3,6 +3,7 @@ package com.bench.mqtt;
 import com.bench.mqtt.connect.ConnectClient;
 import com.bench.mqtt.connect.adapter.ConnectClientAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -27,15 +28,9 @@ public class MqttConnectComponent implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(ApplicationArguments args) throws MqttException {
         log.info("Connecting to MQTT");
-        new Thread(() -> {
-            try {
-                ConnectClient connectClient = connectClientAdapter.getAdapter();
-                connectClient.connect();
-            } catch (Exception e) {
-                log.warn("Failed to connect MQTT", e);
-            }
-        }).start();
+        ConnectClient connectClient = connectClientAdapter.getAdapter();
+        connectClient.connect();
     }
 }
