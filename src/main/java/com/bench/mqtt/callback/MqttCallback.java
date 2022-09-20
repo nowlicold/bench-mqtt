@@ -1,6 +1,5 @@
 package com.bench.mqtt.callback;
 
-import com.bench.mqtt.client.MqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;

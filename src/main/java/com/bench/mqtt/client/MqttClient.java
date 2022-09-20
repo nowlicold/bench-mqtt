@@ -3,6 +3,7 @@ package com.bench.mqtt.client;
 import com.bench.mqtt.callback.MqttCallback;
 import com.bench.mqtt.config.MqttConfig;
 import com.bench.mqtt.config.generator.MqttConfigGenerator;
+import com.bench.mqtt.connect.adapter.DefaultConnectClientAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
@@ -225,11 +226,13 @@ public class MqttClient implements IMqttClient {
 
     @Override
     public void publish(String s, byte[] bytes, int i, boolean b) throws MqttException {
+        checkConnect();
         mqttClient.publish(s, bytes, i, b);
     }
 
     @Override
     public void publish(String s, MqttMessage mqttMessage) throws MqttException {
+        checkConnect();
         mqttClient.publish(s, mqttMessage);
     }
 
@@ -281,5 +284,20 @@ public class MqttClient implements IMqttClient {
     @Override
     public void close() throws MqttException {
         mqttClient.close();
+    }
+
+    /**
+     * <p>
+     * 检查连接状态，如果连接断开则尝试重连
+     * </p>
+     *
+     * @author Karl
+     * @date 2022/9/20 14:26
+     */
+    @SneakyThrows
+    private void checkConnect() {
+        if (!isConnected()) {
+            mqttCallback.connectionLost(this, new Throwable("Try to reconnect for checking connect"));
+        }
     }
 }

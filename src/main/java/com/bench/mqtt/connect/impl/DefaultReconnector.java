@@ -40,7 +40,7 @@ public class DefaultReconnector implements Reconnector {
         private Integer retryCount;*/
 
         @Value("${mqtt.retry.interval:1000}")
-        private Integer retryInterval=1000;
+        private Integer retryInterval = 1000;
 
         public ReconnectTimer() {
             timer = new Timer();
@@ -51,16 +51,19 @@ public class DefaultReconnector implements Reconnector {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    log.info("run reconnection timer");
+
                     if (connectClient.isConnected()) {
+                        log.info("Canceled timer for client is connected.");
                         timer.cancel();
                         return;
                     }
 
+                    log.info("start to reconnect");
+
                     try {
-                        if (!connectClient.isConnected()){
-                            connectClient.reconnect();
-                        }
-                    } catch (MqttException e){
+                        connectClient.reconnect();
+                    } catch (MqttException e) {
                         // 已经连接上了，忽略
                         if (e.getReasonCode() == MqttException.REASON_CODE_CONNECT_IN_PROGRESS) {
                             timer.cancel();

@@ -172,21 +172,25 @@ public class AsyncMqttClient implements IMqttAsyncClient {
 
     @Override
     public IMqttDeliveryToken publish(String s, byte[] bytes, int i, boolean b) throws MqttException {
+        checkConnect();
         return mqttClient.publish(s, bytes, i, b);
     }
 
     @Override
     public IMqttDeliveryToken publish(String s, byte[] bytes, int i, boolean b, Object o, IMqttActionListener iMqttActionListener) throws MqttException {
+        checkConnect();
         return mqttClient.publish(s, bytes, i, b, o, iMqttActionListener);
     }
 
     @Override
     public IMqttDeliveryToken publish(String s, MqttMessage mqttMessage) throws MqttException {
+        checkConnect();
         return mqttClient.publish(s, mqttMessage);
     }
 
     @Override
     public IMqttDeliveryToken publish(String s, MqttMessage mqttMessage, Object o, IMqttActionListener iMqttActionListener) throws MqttException {
+        checkConnect();
         return mqttClient.publish(s, mqttMessage, o, iMqttActionListener);
     }
 
@@ -317,5 +321,20 @@ public class AsyncMqttClient implements IMqttAsyncClient {
     @Override
     public void close() throws MqttException {
         mqttClient.close();
+    }
+
+    /**
+     * <p>
+     * 检查连接状态，如果连接断开则尝试重连
+     * </p>
+     *
+     * @author Karl
+     * @date 2022/9/20 14:26
+     */
+    @SneakyThrows
+    private void checkConnect() {
+        if (!isConnected()) {
+            mqttCallback.connectionLost(this, new Throwable("Try to reconnect for checking connect"));
+        }
     }
 }
