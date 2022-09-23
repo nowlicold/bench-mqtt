@@ -13,7 +13,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
@@ -59,13 +58,6 @@ public class DefaultMqttCallback implements MqttCallback {
     @Override
     public void connectComplete(IMqttClient mqttClient, boolean reconnect, String serverURI) {
         log.info("MQTT connected");
-
-        try {
-            mqttClient.publish("/felo/app/yd996720A2600649649D836C46E41FBB0A/9a7ab66b87c470a57d2ffa7047494f9e", "test".getBytes(StandardCharsets.UTF_8), 1, false);
-        } catch (MqttException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     /**

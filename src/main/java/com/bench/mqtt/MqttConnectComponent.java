@@ -2,6 +2,7 @@ package com.bench.mqtt;
 
 import com.bench.mqtt.connect.ConnectClient;
 import com.bench.mqtt.connect.adapter.ConnectClientAdapter;
+import com.bench.mqtt.hook.MqttConnectBeforeComponent;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MqttConnectComponent implements ApplicationRunner {
     private final ConnectClientAdapter connectClientAdapter;
+    private final MqttConnectBeforeComponent mqttConnectBeforeComponent;
 
     @Autowired
-    public MqttConnectComponent(ConnectClientAdapter connectClientAdapter) {
+    public MqttConnectComponent(ConnectClientAdapter connectClientAdapter, MqttConnectBeforeComponent mqttConnectBeforeComponent) {
         this.connectClientAdapter = connectClientAdapter;
+        this.mqttConnectBeforeComponent = mqttConnectBeforeComponent;
     }
 
     @Override
     public void run(ApplicationArguments args) throws MqttException {
-        log.info("Connecting to MQTT");
-        ConnectClient connectClient = connectClientAdapter.getAdapter();
-        connectClient.connect();
+        if (mqttConnectBeforeComponent.before()) {
+            log.info("Connecting to MQTT");
+            ConnectClient connectClient = connectClientAdapter.getAdapter();
+            connectClient.connect();
+        }
     }
 }
