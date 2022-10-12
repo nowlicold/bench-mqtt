@@ -79,8 +79,7 @@ public class MqttClient implements IMqttClient {
     @Override
     public void connect() throws MqttException {
         if (!Objects.isNull(mqttClient) && mqttClient.isConnected()) {
-            disconnect();
-            close();
+            return;
         }
 
         MqttConfig mqttConfig = mqttConfigGenerator.generator();

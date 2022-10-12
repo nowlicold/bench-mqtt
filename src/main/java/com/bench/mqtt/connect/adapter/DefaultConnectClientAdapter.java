@@ -34,7 +34,6 @@ public class DefaultConnectClientAdapter implements ConnectClientAdapter {
             public void connect() throws MqttException {
                 mqttClient.connect();
             }
-
             @Override
             public void reconnect() throws MqttException {
                 if (!mqttClient.isConnected()){
@@ -42,10 +41,13 @@ public class DefaultConnectClientAdapter implements ConnectClientAdapter {
                 }
 
             }
-
             @Override
             public boolean isConnected() {
                 return mqttClient.isConnected();
+            }
+            @Override
+            public String getClientId() {
+                return mqttClient.getClientId();
             }
         };
     }

@@ -276,7 +276,6 @@ public class AsyncMqttClient implements IMqttAsyncClient {
 
     @Override
     public void reconnect() throws MqttException {
-
         try {
             if (!mqttClient.isConnected()) mqttClient.reconnect();
         } catch (MqttException e) {

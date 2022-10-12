@@ -43,6 +43,11 @@ public class AsyncConnectClientAdapter implements ConnectClientAdapter {
             public boolean isConnected() {
                 return mqttClient.isConnected();
             }
+
+            @Override
+            public String getClientId() {
+                return mqttClient.getClientId();
+            }
         };
     }
 }

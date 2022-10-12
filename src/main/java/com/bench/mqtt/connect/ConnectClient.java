@@ -12,7 +12,10 @@ import org.eclipse.paho.client.mqttv3.MqttException;
  */
 public interface ConnectClient {
     void connect() throws MqttException;
+
     void reconnect() throws MqttException;
 
     boolean isConnected();
+
+    String getClientId();
 }
