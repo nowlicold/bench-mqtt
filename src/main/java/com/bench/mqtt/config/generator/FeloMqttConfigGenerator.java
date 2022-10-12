@@ -35,8 +35,6 @@ import java.util.Objects;
 @Lazy
 @Slf4j
 public class FeloMqttConfigGenerator implements MqttConfigGenerator {
-
-    private int count = 1;
     private final FeloAppConfig feloAppConfig;
 
     @Autowired
@@ -46,40 +44,29 @@ public class FeloMqttConfigGenerator implements MqttConfigGenerator {
 
     @Override
     public MqttConfig generator() {
-        log.info("generate password {}", count++ % 5);
-
-        if (count % 5 == 0) {
-            JsonNode jsonNode = getMqttInfo();
-            if (Objects.isNull(jsonNode)){
-                throw new RuntimeException("failed to generate mqtt info");
-            }
-
-            String url = JacksonUtils.getStringValue(jsonNode, "tcp_url");
-            String clientId = JacksonUtils.getStringValue(jsonNode, "client_id");
-            String username = JacksonUtils.getStringValue(jsonNode, "username");
-            String password = JacksonUtils.getStringValue(jsonNode, "token");
-
-            MqttConfig mqttConfig = new MqttConfig();
-            mqttConfig.setUrl(url);
-            mqttConfig.setClientId(clientId);
-            mqttConfig.setUsername(username);
-            mqttConfig.setPassword(password);
-            log.info("clientId {}", clientId);
-            return mqttConfig;
+        JsonNode jsonNode = getMqttInfo();
+        if (Objects.isNull(jsonNode)) {
+            throw new RuntimeException("failed to generate mqtt info");
         }
 
+        String url = JacksonUtils.getStringValue(jsonNode, "tcp_url");
+        String clientId = JacksonUtils.getStringValue(jsonNode, "client_id");
+        String username = JacksonUtils.getStringValue(jsonNode, "username");
+        String password = JacksonUtils.getStringValue(jsonNode, "token");
+
         MqttConfig mqttConfig = new MqttConfig();
-        mqttConfig.setUrl("ssl://mqtt.felo.me");
-        mqttConfig.setClientId("76575675758577567657567567567567");
-        mqttConfig.setUsername("98b16eebde93f9f64234671dbcaac10b");
-        mqttConfig.setPassword("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbmZvIjp7InNlcnZlcl9pZCI6InlkOURERjA4ODBBQjAzNDE0NkFCM0M3M0ExMEY2RUQ2MkEiLCJzZXJ2ZXJfdHlwZSI6MiwiY2xpZW50X3R5cGUiOjMsInRva2VuX3R5cGUiOjAsImN1c3RvbWVyX2lkIjoiOThiMTZlZWJkZTkzZjlmNjQyMzQ2NzFkYmNhYWMxMGIiLCJjbGllbnRfaWQiOiI3NjU3NTY3NTc1ODU3NzU2NzY1NzU2NzU2NzU2NzU2NyIsInVzZXJuYW1lIjoiOThiMTZlZWJkZTkzZjlmNjQyMzQ2NzFkYmNhYWMxMGIifSwiZXhwIjoxNjY1NTcyMDE1fQ.e-IJ98UhD3ckEtj4SwzcDhV7wjDBikP6F6DyE-zANjE");
+        mqttConfig.setUrl(url);
+        mqttConfig.setClientId(clientId);
+        mqttConfig.setUsername(username);
+        mqttConfig.setPassword(password);
+        log.info("clientId {}", clientId);
         return mqttConfig;
     }
 
     private String getAppAccessToken() {
         JsonNode jsonNode = execute("/sdk/app_access_token", feloAppConfig, "");
-        if (Objects.isNull(jsonNode)){
-            log.error("failed to get app access token." );
+        if (Objects.isNull(jsonNode)) {
+            log.error("failed to get app access token.");
             return null;
         }
         return JacksonUtils.getStringValue(jsonNode, "app_access_token");
@@ -87,7 +74,7 @@ public class FeloMqttConfigGenerator implements MqttConfigGenerator {
 
     private JsonNode getMqttInfo() {
         String token = getAppAccessToken();
-        if (Objects.isNull(token)){
+        if (Objects.isNull(token)) {
             return null;
         }
 
@@ -98,7 +85,7 @@ public class FeloMqttConfigGenerator implements MqttConfigGenerator {
         body.put("topic_mode", 0);
 
         JsonNode jsonNode = execute("/sdk/mqtt/token/generate", body, token);
-        if (Objects.isNull(jsonNode)){
+        if (Objects.isNull(jsonNode)) {
             log.error("failed to get mqtt info.");
             return null;
         }
