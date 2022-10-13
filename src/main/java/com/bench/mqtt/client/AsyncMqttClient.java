@@ -24,8 +24,8 @@ import java.util.Objects;
  * @date 2022/7/1 18:53
  */
 @Slf4j
-@Component
-@ConditionalOnProperty(name = "mqtt.client", havingValue = MqttClientType.ASYNC)
+//@Component
+//@ConditionalOnProperty(name = "mqtt.client", havingValue = MqttClientType.ASYNC)
 public class AsyncMqttClient implements IMqttAsyncClient {
     private final AsyncMqttCallback mqttCallback;
     private final MqttConfigGenerator mqttConfigGenerator;

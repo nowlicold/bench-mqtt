@@ -37,6 +37,8 @@ import java.util.Objects;
 public class FeloMqttConfigGenerator implements MqttConfigGenerator {
     private final FeloAppConfig feloAppConfig;
 
+    //private int count = 0;
+
     @Autowired
     public FeloMqttConfigGenerator(FeloAppConfig feloAppConfig) {
         this.feloAppConfig = feloAppConfig;
@@ -53,6 +55,14 @@ public class FeloMqttConfigGenerator implements MqttConfigGenerator {
         String clientId = JacksonUtils.getStringValue(jsonNode, "client_id");
         String username = JacksonUtils.getStringValue(jsonNode, "username");
         String password = JacksonUtils.getStringValue(jsonNode, "token");
+
+       /* count++;
+        log.info("count {}", count);
+        if (count == 1) {
+            clientId = "76575675758577567657567567567567";
+            username = "98b16eebde93f9f64234671dbcaac10b";
+            password = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbmZvIjp7InNlcnZlcl9pZCI6InlkOURERjA4ODBBQjAzNDE0NkFCM0M3M0ExMEY2RUQ2MkEiLCJzZXJ2ZXJfdHlwZSI6MiwiY2xpZW50X3R5cGUiOjMsInRva2VuX3R5cGUiOjAsImN1c3RvbWVyX2lkIjoiOThiMTZlZWJkZTkzZjlmNjQyMzQ2NzFkYmNhYWMxMGIiLCJjbGllbnRfaWQiOiI3NjU3NTY3NTc1ODU3NzU2NzY1NzU2NzU2NzU2NzU2NyIsInVzZXJuYW1lIjoiOThiMTZlZWJkZTkzZjlmNjQyMzQ2NzFkYmNhYWMxMGIifSwiZXhwIjoxNjY1NjUxNzI5fQ.pcqDHYRMVuJQFfsgVX2V-itpKZWVUUP0rVAeRX1pPbg";
+        }*/
 
         MqttConfig mqttConfig = new MqttConfig();
         mqttConfig.setUrl(url);

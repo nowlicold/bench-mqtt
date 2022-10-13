@@ -3,16 +3,16 @@ package com.bench.mqtt.client;
 import com.bench.mqtt.callback.MqttCallback;
 import com.bench.mqtt.config.MqttConfig;
 import com.bench.mqtt.config.generator.MqttConfigGenerator;
-import com.bench.mqtt.connect.adapter.DefaultConnectClientAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>
@@ -25,11 +25,13 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "mqtt.client", matchIfMissing = true, havingValue = MqttClientType.DEFAULT)
+//@ConditionalOnProperty(name = "mqtt.client", matchIfMissing = true, havingValue = MqttClientType.DEFAULT)
 public class MqttClient implements IMqttClient {
     private final MqttCallback mqttCallback;
     private final MqttConfigGenerator mqttConfigGenerator;
     private IMqttClient mqttClient;
+
+    private final Lock lock = new ReentrantLock();
 
     @Autowired
     public MqttClient(MqttCallback mqttCallback, MqttConfigGenerator mqttConfigGenerator) {
@@ -82,20 +84,34 @@ public class MqttClient implements IMqttClient {
             return;
         }
 
-        MqttConfig mqttConfig = mqttConfigGenerator.generator();
+        if (lock.tryLock()) {
+            try {
+                if (!Objects.isNull(mqttClient) && mqttClient.isConnected()) {
+                    return;
+                }
 
-        mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConfig.getUrl(), mqttConfig.getClientId(), new MemoryPersistence());
-        mqttClient.setCallback(new InternalCallback(mqttCallback)); // 设置默认回调
+                if (!Objects.isNull(mqttClient)) {
+                    mqttClient.close();
+                }
 
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(mqttConfig.getUsername());
-        options.setPassword(mqttConfig.getPassword().toCharArray());
-        options.setKeepAliveInterval(mqttConfig.getKeepAliveInterval());
-        options.setConnectionTimeout(mqttConfig.getConnectionTimeout());
-        options.setCleanSession(mqttConfig.isCleanSession());
+                MqttConfig mqttConfig = mqttConfigGenerator.generator();
+                mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConfig.getUrl(), mqttConfig.getClientId(), new MemoryPersistence());
+                mqttClient.setCallback(new InternalCallback(mqttCallback)); // 设置默认回调
 
-        log.info("connecting to MQTT Server. clientId: {}", mqttConfig.getClientId());
-        this.mqttClient.connect(options);
+                MqttConnectOptions options = new MqttConnectOptions();
+                options.setUserName(mqttConfig.getUsername());
+                options.setPassword(mqttConfig.getPassword().toCharArray());
+                options.setKeepAliveInterval(mqttConfig.getKeepAliveInterval());
+                options.setConnectionTimeout(mqttConfig.getConnectionTimeout());
+                options.setCleanSession(mqttConfig.isCleanSession());
+
+                log.info("connecting to MQTT Server. clientId: {}", mqttConfig.getClientId());
+                this.mqttClient.connect(options);
+            } finally {
+                lock.unlock();
+            }
+        }
+
     }
 
     @Override

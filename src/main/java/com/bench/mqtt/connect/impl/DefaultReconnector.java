@@ -2,6 +2,7 @@ package com.bench.mqtt.connect.impl;
 
 import com.bench.mqtt.connect.ConnectClient;
 import com.bench.mqtt.connect.Reconnector;
+import com.bench.mqtt.exception.BadUsernamePasswordException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,8 +34,8 @@ public class DefaultReconnector implements Reconnector {
         @Value("${mqtt.retry.count:3}")
         private Integer retryCount = 3;
 
-        @Value("${mqtt.retry.interval:1000}")
-        private Integer retryInterval = 1000;
+        @Value("${mqtt.retry.interval:3000}")
+        private Integer retryInterval = 3000;
 
         // 重试次数
         private int currentRetry = 0;
@@ -54,8 +55,8 @@ public class DefaultReconnector implements Reconnector {
                         return;
                     }
 
-                    log.info("start to reconnect. clientId: {}", connectClient.getClientId());
-                    if (currentRetry++ > retryCount) {
+                    log.info("start to reconnect {} times. clientId: {}", ++currentRetry, connectClient.getClientId());
+                    if (currentRetry > retryCount) {
                         connect();
                         return;
                     }
@@ -64,8 +65,10 @@ public class DefaultReconnector implements Reconnector {
                         connectClient.reconnect();
                     } catch (MqttException e) {
                         // 已经连接上了，忽略
-                        if (e.getReasonCode() == MqttException.REASON_CODE_CONNECT_IN_PROGRESS && connectClient.isConnected()) {
-                            stop();
+                        if (e.getReasonCode() == MqttException.REASON_CODE_CONNECT_IN_PROGRESS) {
+                            if (connectClient.isConnected()) {
+                                stop();
+                            }
                             return;
                         }
                         log.error("failed to reconnect. try to connect again.", e);
@@ -86,8 +89,7 @@ public class DefaultReconnector implements Reconnector {
                     currentRetry = 0;
                     timer.cancel();
                 }
-
-            }, 0, retryInterval);
+            }, 50, retryInterval);
         }
     }
 }
