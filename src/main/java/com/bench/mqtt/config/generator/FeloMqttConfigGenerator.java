@@ -96,7 +96,7 @@ public class FeloMqttConfigGenerator implements MqttConfigGenerator {
 
         JsonNode jsonNode = execute("/sdk/mqtt/token/generate", body, token);
         if (Objects.isNull(jsonNode)) {
-            log.error("failed to get mqtt info.");
+            log.error("failed to get mqtt info.result={}",JacksonUtils.toJson(jsonNode!=null?jsonNode:null));
             return null;
         }
 
