@@ -19,4 +19,6 @@ public class FeloAppConfig {
     private String appId;
     private String appSecret;
     private String feloSvrUrl;
+
+    private String mqttUrl;
 }

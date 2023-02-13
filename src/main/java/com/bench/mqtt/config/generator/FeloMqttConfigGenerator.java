@@ -18,10 +18,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -51,7 +48,10 @@ public class FeloMqttConfigGenerator implements MqttConfigGenerator {
             throw new RuntimeException("failed to generate mqtt info");
         }
 
-        String url = JacksonUtils.getStringValue(jsonNode, "tcp_url");
+        String url =  StringUtils.isNotBlank(feloAppConfig.getMqttUrl())
+                ? feloAppConfig.getMqttUrl()
+                : JacksonUtils.getStringValue(jsonNode, "tcp_url");
+
         String clientId = JacksonUtils.getStringValue(jsonNode, "client_id");
         String username = JacksonUtils.getStringValue(jsonNode, "username");
         String password = JacksonUtils.getStringValue(jsonNode, "token");
