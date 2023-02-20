@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -25,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Slf4j
 @Component
-//@ConditionalOnProperty(name = "mqtt.client", matchIfMissing = true, havingValue = MqttClientType.DEFAULT)
+@ConditionalOnProperty(name = "mqtt.client", matchIfMissing = true, havingValue = MqttClientType.DEFAULT)
 public class MqttClient implements IMqttClient {
     private final MqttCallback mqttCallback;
     private final MqttConfigGenerator mqttConfigGenerator;
@@ -96,7 +97,29 @@ public class MqttClient implements IMqttClient {
 
                 MqttConfig mqttConfig = mqttConfigGenerator.generator();
                 mqttClient = new org.eclipse.paho.client.mqttv3.MqttClient(mqttConfig.getUrl(), mqttConfig.getClientId(), new MemoryPersistence());
-                mqttClient.setCallback(new InternalCallback(mqttCallback)); // 设置默认回调
+                //mqttClient.setCallback(new InternalCallback(mqttCallback)); // 设置默认回调
+                mqttClient.setCallback(new MqttCallbackExtended() {
+                    @Override
+                    public void connectComplete(boolean reconnect, String serverURI) {
+                        log.info("connect complete | " + reconnect + " | " + serverURI);
+                    }
+
+                    @Override
+                    public void connectionLost(Throwable cause) {
+                        log.info("connection lost");
+                    }
+
+                    @Override
+                    public void messageArrived(String topic, MqttMessage message) throws Exception {
+                        log.info("message arrived | " + topic+" | "+ message);
+                    }
+
+                    @Override
+                    public void deliveryComplete(IMqttDeliveryToken token) {
+                        log.info("delivery complete | " + token);
+                    }
+
+                });
 
                 MqttConnectOptions options = new MqttConnectOptions();
                 options.setUserName(mqttConfig.getUsername());
@@ -104,6 +127,8 @@ public class MqttClient implements IMqttClient {
                 options.setKeepAliveInterval(mqttConfig.getKeepAliveInterval());
                 options.setConnectionTimeout(mqttConfig.getConnectionTimeout());
                 options.setCleanSession(mqttConfig.isCleanSession());
+                options.setAutomaticReconnect(true);
+                options.setMaxReconnectDelay(5);
 
                 log.info("connecting to MQTT Server. clientId: {}", mqttConfig.getClientId());
                 this.mqttClient.connect(options);

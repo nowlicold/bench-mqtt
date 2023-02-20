@@ -20,8 +20,7 @@ public class MqttConfig {
     private String username;
     private String password;
 
-    // 默认心跳 60s，在连接 60s 后会断开连接
-    private int keepAliveInterval = MqttConnectOptions.CONNECTION_TIMEOUT_DEFAULT;
+    private int keepAliveInterval = 5;
     private int connectionTimeout = MqttConnectOptions.CONNECTION_TIMEOUT_DEFAULT;
     private boolean cleanSession = MqttConnectOptions.CLEAN_SESSION_DEFAULT;
 }

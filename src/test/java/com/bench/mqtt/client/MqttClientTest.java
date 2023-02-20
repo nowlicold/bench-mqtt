@@ -7,6 +7,8 @@ import com.bench.mqtt.config.generator.MqttConfigGenerator;
 import com.bench.mqtt.connect.impl.DefaultReconnector;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * <p>
  * MQTTClientTest
@@ -17,7 +19,10 @@ import org.junit.Test;
  */
 public class MqttClientTest {
     @Test
-    public void test() throws InterruptedException {
+    public void test() {
+
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
         new Thread(() -> {
             DefaultMqttCallback defaultMqttCallback = new DefaultMqttCallback(new DefaultReconnector());
 
@@ -33,10 +38,13 @@ public class MqttClientTest {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }).start();
 
-        Thread.sleep(600000);
+        try {
+            countDownLatch.await();//需要捕获异常，当其中线程数为0时这里才会继续运行
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
     }
 }
 
