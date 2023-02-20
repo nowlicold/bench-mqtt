@@ -127,8 +127,9 @@ public class MqttClient implements IMqttClient {
                 options.setKeepAliveInterval(mqttConfig.getKeepAliveInterval());
                 options.setConnectionTimeout(mqttConfig.getConnectionTimeout());
                 options.setCleanSession(mqttConfig.isCleanSession());
-                options.setAutomaticReconnect(true);
-                options.setMaxReconnectDelay(5);
+                //options.setAutomaticReconnect(true);
+                //options.setMaxReconnectDelay(5);
+                options.setMaxInflight(50);
 
                 log.info("connecting to MQTT Server. clientId: {}", mqttConfig.getClientId());
                 this.mqttClient.connect(options);
