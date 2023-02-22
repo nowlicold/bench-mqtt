@@ -1,7 +1,6 @@
 package com.bench.mqtt.connect;
 
 import com.bench.mqtt.client.MqttClient;
-import com.bench.mqtt.connect.adapter.ConnectClientAdapter;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 /**
@@ -13,5 +12,5 @@ import org.eclipse.paho.client.mqttv3.MqttException;
  * @date 2022/6/30 18:35
  */
 public interface Reconnector {
-    void reconnect(ConnectClient connectClient) throws MqttException;
+    void reconnect(MqttClient mqttClient) throws MqttException;
 }

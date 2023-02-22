@@ -1,8 +1,7 @@
 package com.bench.mqtt.connect.impl;
 
-import com.bench.mqtt.connect.ConnectClient;
+import com.bench.mqtt.client.MqttClient;
 import com.bench.mqtt.connect.Reconnector;
-import com.bench.mqtt.exception.BadUsernamePasswordException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +22,7 @@ import java.util.TimerTask;
 @Slf4j
 public class DefaultReconnector implements Reconnector {
     @Override
-    public void reconnect(ConnectClient connectClient) throws MqttException {
+    public void reconnect(MqttClient connectClient) throws MqttException {
         ReconnectTimer reconnectTimer = new ReconnectTimer();
         reconnectTimer.start(connectClient);
     }
@@ -44,7 +43,7 @@ public class DefaultReconnector implements Reconnector {
             timer = new Timer();
         }
 
-        public void start(ConnectClient connectClient) {
+        public void start(MqttClient connectClient) {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {

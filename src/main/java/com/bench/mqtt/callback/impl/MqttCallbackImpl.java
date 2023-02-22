@@ -1,14 +1,11 @@
 package com.bench.mqtt.callback.impl;
 
 import com.bench.lang.base.string.utils.StringUtils;
-import com.bench.mqtt.callback.*;
-import com.bench.mqtt.client.AsyncMqttClient;
-import com.bench.mqtt.connect.ConnectClient;
+import com.bench.mqtt.callback.MqttCallback;
+import com.bench.mqtt.client.MqttClient;
 import com.bench.mqtt.connect.Reconnector;
-import com.bench.mqtt.connect.adapter.AsyncConnectClientAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -18,18 +15,18 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * 异步 MQTT 客户端，全局回调器
+ * 同步 MQTT 客户端，全局回调器
  *
  * @author Karl
  * @date 2022/2/18
  */
 @Component
 @Slf4j
-public class DefaultAsyncMqttCallback implements AsyncMqttCallback {
+public class MqttCallbackImpl implements MqttCallback {
     private final Reconnector reconnector;
 
     @Autowired
-    public DefaultAsyncMqttCallback(Reconnector reconnector) {
+    public MqttCallbackImpl(Reconnector reconnector) {
         this.reconnector = reconnector;
     }
 
@@ -41,13 +38,14 @@ public class DefaultAsyncMqttCallback implements AsyncMqttCallback {
      * @param throwable throwable
      */
     @Override
-    public void connectionLost(IMqttAsyncClient mqttClient, Throwable throwable) throws MqttException {
+    public void connectionLost(MqttClient mqttClient, Throwable throwable) throws MqttException {
         log.error("MQTT disconnected: {}", throwable.getMessage());
         throwable.printStackTrace();
         log.info("MQTT reconnecting...");
         //重新连接
-        reconnector.reconnect(new AsyncConnectClientAdapter(mqttClient).getAdapter());
+        reconnector.reconnect(mqttClient);
     }
+
     /**
      * 连接/重连成功后调用
      * <p>
@@ -57,7 +55,7 @@ public class DefaultAsyncMqttCallback implements AsyncMqttCallback {
      * @param serverURI serverURI
      */
     @Override
-    public void connectComplete(IMqttAsyncClient mqttClient, boolean reconnect, String serverURI) {
+    public void connectComplete(MqttClient mqttClient, boolean reconnect, String serverURI) {
         log.info("MQTT connected");
     }
 
@@ -83,7 +81,7 @@ public class DefaultAsyncMqttCallback implements AsyncMqttCallback {
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
         String[] topics = iMqttDeliveryToken.getTopics();
         MqttMessage message = iMqttDeliveryToken.getMessage();
-        if(Objects.nonNull(message)){
+        if (Objects.nonNull(message)) {
             String payload = new String(message.getPayload());
             log.info("MQTT message delivered. {} -> {}", payload, StringUtils.join(topics, StringUtils.COMMA_SIGN));
         }

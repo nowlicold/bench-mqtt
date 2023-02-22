@@ -1,6 +1,6 @@
 package com.bench.mqtt.callback;
 
-import org.eclipse.paho.client.mqttv3.IMqttClient;
+import com.bench.mqtt.client.MqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -14,9 +14,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
  * @date 2022/7/1 17:36
  */
 public interface MqttCallback {
-    void connectComplete(IMqttClient mqttClient, boolean reconnect, String serverURI);
+    void connectComplete(MqttClient mqttClient, boolean reconnect, String serverURI);
 
-    void connectionLost(IMqttClient mqttClient, Throwable throwable) throws MqttException;
+    void connectionLost(MqttClient mqttClient, Throwable throwable) throws MqttException;
 
     void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken);
 

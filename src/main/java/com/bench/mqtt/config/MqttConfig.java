@@ -20,7 +20,9 @@ public class MqttConfig {
     private String username;
     private String password;
 
-    private int keepAliveInterval = 5;
+    private int keepAliveInterval = 60;
     private int connectionTimeout = MqttConnectOptions.CONNECTION_TIMEOUT_DEFAULT;
     private boolean cleanSession = MqttConnectOptions.CLEAN_SESSION_DEFAULT;
+
+    private int maxInflight = 100;
 }
