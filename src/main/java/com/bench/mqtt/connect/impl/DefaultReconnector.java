@@ -22,7 +22,7 @@ import java.util.TimerTask;
 @Slf4j
 public class DefaultReconnector implements Reconnector {
     @Override
-    public void reconnect(MqttClient connectClient) throws MqttException {
+    public void reconnect(MqttClient connectClient) {
         ReconnectTimer reconnectTimer = new ReconnectTimer();
         reconnectTimer.start(connectClient);
     }
@@ -79,7 +79,7 @@ public class DefaultReconnector implements Reconnector {
                 private void connect() {
                     try {
                         connectClient.connect();
-                    } catch (MqttException ex) {
+                    } catch (Exception ex) {
                         log.error("failed to connect mqtt. ", ex);
                     }
                 }
